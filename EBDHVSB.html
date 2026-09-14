@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Waste Collection Scheduler</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: #f4f7f6;
+            color: #333;
+        }
+        
+        header {
+            background: #176b3a;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        header h1 {
+            font-size: 25px;
+        }
+        
+        header span {
+            font-size: 14px;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+        /* Dashboard Cards */
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .card h3 {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .card p {
+            font-size: 28px;
+            font-weight: bold;
+            color: #176b3a;
+        }
+        /* Main Section */
+        
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 25px;
+        }
+        
+        .box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .box h2 {
+            margin-bottom: 20px;
+            color: #176b3a;
+        }
+        /* Form */
+        
+        label {
+            display: block;
+            margin: 12px 0 6px;
+            font-weight: bold;
+        }
+        
+        input,
+        select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            outline: none;
+        }
+        
+        input:focus,
+        select:focus {
+            border-color: #176b3a;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #176b3a;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background: #0f512b;
+        }
+        /* Table */
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: #e8f4ed;
+            color: #176b3a;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .scheduled {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .pending {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .delete-btn {
+            background: #d9534f;
+            padding: 7px 10px;
+            margin: 0;
+            width: auto;
+            font-size: 12px;
+        }
+        
+        .delete-btn:hover {
+            background: #b52b27;
+        }
+        /* Notification */
+        
+        #message {
+            display: none;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 7px;
+            text-align: center;
+        }
+        
+        footer {
+            margin-top: 40px;
+            background: #176b3a;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+        /* Responsive */
+        
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .main {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 500px) {
+            header {
+                padding: 15px;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                width: 94%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>♻️ Smart Waste Collection Scheduler</h1>
+        <span>Smart & Efficient Waste Management</span>
+    </header>
+
+    <div class="container">
+
+        <div id="message">
+            ✅ Waste collection scheduled successfully!
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+
+            <div class="card">
+                <h3>Total Collections</h3>
+                <p id="total">4</p>
+            </div>
+
+            <div class="card">
+                <h3>Scheduled</h3>
+                <p id="scheduled">2</p>
+            </div>
+
+            <div class="card">
+                <h3>Completed</h3>
+                <p id="completed">1</p>
+            </div>
+
+            <div class="card">
+                <h3>Pending</h3>
+                <p id="pending">1</p>
+            </div>
+
+        </div>
+
+        <div class="main">
+
+            <!-- Schedule Form -->
+            <div class="box">
+
+                <h2>📅 Schedule Collection</h2>
+
+                <form id="wasteForm">
+
+                    <label>Area / Location</label>
+                    <select id="area" required>
+                    <option value="">Select Area</option>
+                    <option>Gandhipuram</option>
+                    <option>RS Puram</option>
+                    <option>Saibaba Colony</option>
+                    <option>Peelamedu</option>
+                    <option>Singanallur</option>
+                </select>
+
+                    <label>Waste Type</label>
+                    <select id="wasteType" required>
+                    <option value="">Select Waste Type</option>
+                    <option>Organic Waste</option>
+                    <option>Plastic Waste</option>
+                    <option>Paper Waste</option>
+                    <option>Electronic Waste</option>
+                    <option>Mixed Waste</option>
+                </select>
+
+                    <label>Collection Date</label>
+                    <input type="date" id="date" required>
+
+                    <label>Collection Time</label>
+                    <input type="time" id="time" required>
+
+                    <label>Priority</label>
+                    <select id="priority" required>
+                    <option value="">Select Priority</option>
+                    <option>Normal</option>
+                    <option>High</option>
+                    <option>Emergency</option>
+                </select>
+
+                    <button type="submit">Schedule Collection</button>
+
+                </form>
+
+            </div>
+
+            <!-- Schedule List -->
+            <div class="box">
+
+                <h2>🚛 Collection Schedule</h2>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Area</th>
+                                <th>Waste Type</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="scheduleTable">
+
+                            <tr>
+                                <td>Gandhipuram</td>
+                                <td>Organic</td>
+                                <td>2026-09-15</td>
+                                <td>09:00</td>
+                                <td>Normal</td>
+                                <td>
+                                    <span class="status scheduled">
+                                    Scheduled
+                                </span>
+                                </td>
+                                <td>
+                                    <button class="delete-btn" onclick="deleteRow(this)">
+                                Delete
+                                </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Peelamedu</td>
+                                <td>Plastic</td>
+                                <td>2026-09-15</td>
+                                <td>11:00</td>
+                                <td>High</td>
+                                <td>
+                                    <span class="status pending">
+                                    Pending
+                                </span>
+                                </td>
+                                <td>
+                                    <button class="delete-btn" onclick="deleteRow(this)">
+                                Delete
+                                </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>RS Puram</td>
+                                <td>Paper</td>
+                                <td>2026-09-14</td>
+                                <td>08:30</td>
+                                <td>Normal</td>
+                                <td>
+                                    <span class="status completed">
+                                    Completed
+                                </span>
+                                </td>
+                                <td>
+                                    <button class="delete-btn" onclick="deleteRow(this)">
+                                Delete
+                                </button>
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <footer>
+        Smart Waste Collection Scheduler © 2026
+    </footer>
+
+
+    <script>
+        const form = document.getElementById("wasteForm");
+        const table = document.getElementById("scheduleTable");
+        const message = document.getElementById("message");
+
+        form.addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            // Get values
+            const area = document.getElementById("area").value;
+            const wasteType = document.getElementById("wasteType").value;
+            const date = document.getElementById("date").value;
+            const time = document.getElementById("time").value;
+            const priority = document.getElementById("priority").value;
+
+            // Create new row
+            const row = table.insertRow();
+
+            row.innerHTML = `
+            <td>${area}</td>
+            <td>${wasteType}</td>
+            <td>${date}</td>
+            <td>${time}</td>
+            <td>${priority}</td>
+            <td>
+                <span class="status scheduled">
+                    Scheduled
+                </span>
+            </td>
+            <td>
+                <button class="delete-btn"
+                onclick="deleteRow(this)">
+                Delete
+                </button>
+            </td>
+        `;
+
+            // Update dashboard
+            updateDashboard();
+
+            // Show message
+            message.style.display = "block";
+
+            setTimeout(function() {
+                message.style.display = "none";
+            }, 3000);
+
+            // Clear form
+            form.reset();
+
+        });
+
+
+        // Delete collection
+        function deleteRow(button) {
+
+            button.parentElement.parentElement.remove();
+
+            updateDashboard();
+
+        }
+
+
+        // Update dashboard numbers
+        function updateDashboard() {
+
+            const rows = table.getElementsByTagName("tr");
+
+            let scheduled = 0;
+            let completed = 0;
+            let pending = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+
+                const status =
+                    rows[i].querySelector(".status");
+
+                if (status) {
+
+                    if (status.classList.contains("scheduled")) {
+                        scheduled++;
+                    } else if (status.classList.contains("completed")) {
+                        completed++;
+                    } else if (status.classList.contains("pending")) {
+                        pending++;
+                    }
+                }
+            }
+
+            document.getElementById("total").innerText =
+                rows.length;
+
+            document.getElementById("scheduled").innerText =
+                scheduled;
+
+            document.getElementById("completed").innerText =
+                completed;
+
+            document.getElementById("pending").innerText =
+                pending;
+        }
+    </script>
+
+</body>
+
+</html>
